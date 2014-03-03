@@ -35,7 +35,7 @@ PRODUCT_PACKAGES := \
     Music \
     OneTimeInitializer \
     PrintSpooler \
-    QuickSearchBox \
+    Provision \
     Settings \
     SystemUI \
     TeleService \
@@ -46,7 +46,8 @@ PRODUCT_PACKAGES := \
     WallpaperCropper
 
 ifneq ($(MINI_GAPPS),true)
-PRODUCT_PACKAGES += Provision
+PRODUCT_PACKAGES += \
+    QuickSearchBox
 endif
 
 PRODUCT_PACKAGES += \
