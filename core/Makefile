@@ -737,6 +737,7 @@ ifneq ($(OTA_PACKAGE_SIGNING_KEY),)
 endif
 
 PRODUCT_EXTRA_RECOVERY_KEYS += build/target/product/security/cm
+PRODUCT_EXTRA_RECOVERY_KEYS += build/target/product/security/androidarmv6
 
 # Generate a file containing the keys that will be read by the
 # recovery binary.
@@ -871,7 +872,15 @@ ifdef is_tests_build
 #    $(tests_MODULES))
 endif
 
-FULL_SYSTEMIMAGE_DEPS := $(INTERNAL_SYSTEMIMAGE_FILES) $(INTERNAL_USERIMAGES_DEPS)
+systemimage-squisher: $(INTERNAL_SYSTEMIMAGE_FILES)
+ifeq ($(TARGET_SYSTEMIMAGE_USE_SQUISHER),true)
+	@echo -e ${CL_YLW}"Running squisher..."${CL_RST}
+	$(hide) APKCERTS=$(APKCERTS_FILE) OTA_PACKAGE_SIGNING_KEY=$(OTA_PACKAGE_SIGNING_KEY) TARGET_OTA_EXTRAS_FILE=$(TARGET_OTA_EXTRAS_FILE) ./vendor/cm/tools/squisher
+endif
+
+.PHONY: systemimage-squisher
+
+FULL_SYSTEMIMAGE_DEPS := $(INTERNAL_SYSTEMIMAGE_FILES) $(INTERNAL_USERIMAGES_DEPS) systemimage-squisher
 # -----------------------------------------------------------------
 # installed file list
 # Depending on anything that $(BUILT_SYSTEMIMAGE) depends on.
@@ -1447,6 +1456,7 @@ endif
 $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	@echo "$(OTA_FROM_TARGET_SCRIPT)" > $(PRODUCT_OUT)/ota_script_path
 	@echo "$(override_device)" > $(PRODUCT_OUT)/ota_override_device
+	@echo "$(extras_file)" > $(PRODUCT_OUT)/ota_extras_file
 	@echo "$(BOARD_CUSTOM_BOOTIMG_MK)" > $(PRODUCT_OUT)/ota_custom_bootimg_mk
 	@echo -e ${CL_YLW}"Package OTA:"${CL_RST}" $@"
 	MKBOOTIMG=$(BOARD_CUSTOM_BOOTIMG_MK) \
