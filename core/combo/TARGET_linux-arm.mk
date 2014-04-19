@@ -69,6 +69,7 @@ endif
 TARGET_NO_UNDEFINED_LDFLAGS := -Wl,--no-undefined
 
 TARGET_arm_CFLAGS :=    -O2 \
+			-w \
                         -fomit-frame-pointer \
                         -fstrict-aliasing    \
                         -funswitch-loops
